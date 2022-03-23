@@ -6,6 +6,11 @@ const mongoose = require('mongoose');
 const { db } = require('./api/models/store');
 const Store = require('./api/models/store');
 
+app.use(function(req, res, next){
+  res.header('Access-Control-Allow-Origin', "*");
+  next();
+})
+
 mongoose.connect('mongodb+srv://Slicefpv:Spiderman2w3@cluster0.vmsuk.mongodb.net/?retryWrites=true&w=majority');
 
 app.use(express.json({limit: '50mb'}));
