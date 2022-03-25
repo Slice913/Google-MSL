@@ -22,8 +22,41 @@ const getStores = () => {
         }
      }).then((data) =>{
         searchLocationsNear(data);
+        setStoresList(data);
     })
 }
+
+    // function to loop over stores and get (address, phone number, index) of each store.
+    const setStoresList = (stores) => {
+        let storeListHtml = '';
+        stores.forEach((store, index)=>{
+            storeListHtml += `
+             <div class="store-container">
+               <div class="store-container-background">
+                   <div class="store-info-container">
+                       <div class="store-address">
+                           <span>${store.addressLines[0]}</span>
+                           <span>${store.addressLines[1]}</span>
+                       </div>
+                       <div class="store-phone-number">${store.phoneNumber}</div>
+                   </div>
+                   <div class="store-number-container">
+                       <div class="store-number">
+                           ${index+1}
+                       </div>
+                    </div>
+                 </div>
+              </div>`;
+
+            // let addressTop = store.addressLine[0];
+            // let addressBottom = store.addressLine[1];
+            // let phoneOnList = store.phoneNumber;
+            // let storeIndex = index + 1;
+      })
+
+      document.querySelector('.stores-list').innerHTML = storeListHtml;
+
+    }
 
 const searchLocationsNear = (stores) => {
     let bounds = new google.maps.LatLngBounds();
@@ -55,18 +88,18 @@ const searchLocationsNear = (stores) => {
             </div>
             <div class="store-info-address">
                 <div class="icon">
-                     <i class="fas fa-location-arrow"></i>
+                    <i class="fas fa-location-arrow"></i>
                 </div>
                 <span>
                     ${address}
-                </span>    
+                </span>  
             </div>
             <div class="store-info-phone">
                 <div class="icon">
                      <i class="fas fa-phone-alt"></i>
                 </div>
                 <span>
-                    ${phone}
+                  <a href="tel:${phone}">${phone}</a>
                 </span>
             </div>
         </div>
@@ -82,7 +115,8 @@ const searchLocationsNear = (stores) => {
          map: map,
          position: latlng,
          icon: customMarker,
-         label:`${storeNumber}`,
+         label: `${storeNumber}`,
+         
         });
     
  marker.setMap(map);
@@ -98,9 +132,30 @@ const searchLocationsNear = (stores) => {
             shouldFocus: false,
         });
     });
-   // infoWindow.close();
-}
     
-  
+}
  
+
+    // console.log(setStoresList());
+
+     
+       
+  
+   // console.log(setStoresList());
    
+//    let storeListHtml = `<div class="store-container">
+//    <div class="store-container-background">
+//        <div class="store-info-container">
+//            <div class="store-address">
+//                <span>'${addressTop}'</span>
+//                <span>'${addressBottom}'</span>
+//            </div>
+//            <div class="store-phone-number">'${phoneOnList}'</div>
+//        </div>
+//        <div class="store-number-container">
+//            <div class="store-number">
+//                ${storeIndex}
+//            </div>
+//         </div>
+//      </div>
+//   </div>`;
