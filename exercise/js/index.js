@@ -8,11 +8,16 @@ function initMap() {
  map = new google.maps.Map(document.getElementById("map"), {
    mapId: "45ccadd4b9f9c635",
    center: losAngeles,
-   zoom: 8,
+   zoom: 11,
   });
   infoWindow = new google.maps.InfoWindow();
 }   
-
+ 
+const onEnter = (e) => {
+    if(e.key == "Enter") {
+        getStores();
+    }
+}
 
 const getStores = () => {
     const zipCode = document.getElementById('zip-code').value;
@@ -29,10 +34,15 @@ const getStores = () => {
             throw new Error(response.status);
         }
     }).then((data) =>{
+      if(data.length > 0) {
         clearLocations();
         searchLocationsNear(data);
         setStoresList(data);
         setOnClickListener();
+         } else {
+            clearLocations();
+            noStoresFound();
+         }
     })
 }
 
@@ -44,7 +54,14 @@ const clearLocations = () => {
     markers.length = 0;
 }
 
-
+const noStoresFound = () => {
+    const html = `
+        <div class="no-stores-found">
+            No Stores Found
+        </div>
+    `
+    document.querySelector('.stores-list').innerHTML = html;
+}
 
 const setOnClickListener = () => {
     let storeElements = document.querySelectorAll('.store-container');
