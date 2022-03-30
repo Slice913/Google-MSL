@@ -1,4 +1,6 @@
 let map;
+let infoWindow;
+let markers = [];
 
 function initMap() {
  // let storeMarker = {lat: 34.063380, lng: -118.358080};
@@ -7,29 +9,56 @@ function initMap() {
    mapId: "45ccadd4b9f9c635",
    center: losAngeles,
    zoom: 8,
- });
- getStores();
-} 
+  });
+  infoWindow = new google.maps.InfoWindow();
+}   
+
 
 const getStores = () => {
-  const API_URL = 'http://localhost:3000/api/stores';
-    fetch(API_URL)
-     .then((response)=>{
+    const zipCode = document.getElementById('zip-code').value;
+    if(!zipCode) {
+        return;
+    }
+    const API_URL = 'http://localhost:3000/api/stores';
+    const fullUrl = `${API_URL}?zip_code=${zipCode}`;
+    fetch(fullUrl)
+    .then((response)=>{
         if(response.status == 200){
             return response.json();
         } else {
             throw new Error(response.status);
         }
-     }).then((data) =>{
+    }).then((data) =>{
+        clearLocations();
         searchLocationsNear(data);
         setStoresList(data);
+        setOnClickListener();
     })
 }
 
-    // function to loop over stores and get (address, phone number, index) of each store.
-    const setStoresList = (stores) => {
-        let storeListHtml = '';
-        stores.forEach((store, index)=>{
+const clearLocations = () => {
+    infoWindow.close();
+    for (let i= 0; i < markers.length; i++) {
+        markers[i].setMap(null);
+    }
+    markers.length = 0;
+}
+
+
+
+const setOnClickListener = () => {
+    let storeElements = document.querySelectorAll('.store-container');
+    storeElements.forEach((elem, index)=>{
+        elem.addEventListener('click', ()=>{
+            google.maps.event.trigger(markers[index], 'click');
+        })
+    })
+ }
+
+// function to loop over stores and get (address, phone number, index) of each store.
+const setStoresList = (stores) => {
+    let storeListHtml = '';
+    stores.forEach((store, index)=>{
             storeListHtml += `
              <div class="store-container">
                <div class="store-container-background">
@@ -48,15 +77,9 @@ const getStores = () => {
                  </div>
               </div>`;
 
-            // let addressTop = store.addressLine[0];
-            // let addressBottom = store.addressLine[1];
-            // let phoneOnList = store.phoneNumber;
-            // let storeIndex = index + 1;
       })
-
       document.querySelector('.stores-list').innerHTML = storeListHtml;
-
-    }
+     }
 
 const searchLocationsNear = (stores) => {
     let bounds = new google.maps.LatLngBounds();
@@ -121,41 +144,10 @@ const searchLocationsNear = (stores) => {
     
  marker.setMap(map);
 
-    const infoWindow = new google.maps.InfoWindow({
-        content: html,
-        });
-
-        marker.addListener("click", () => {
-            infoWindow.open({
-            anchor: marker,
-            map,
-            shouldFocus: false,
-        });
+      google.maps.event.addListener(marker, "click", () => {
+       infoWindow.open(map, marker);
+       infoWindow.setContent(html);
     });
+    markers.push(marker);
     
 }
- 
-
-    // console.log(setStoresList());
-
-     
-       
-  
-   // console.log(setStoresList());
-   
-//    let storeListHtml = `<div class="store-container">
-//    <div class="store-container-background">
-//        <div class="store-info-container">
-//            <div class="store-address">
-//                <span>'${addressTop}'</span>
-//                <span>'${addressBottom}'</span>
-//            </div>
-//            <div class="store-phone-number">'${phoneOnList}'</div>
-//        </div>
-//        <div class="store-number-container">
-//            <div class="store-number">
-//                ${storeIndex}
-//            </div>
-//         </div>
-//      </div>
-//   </div>`;
